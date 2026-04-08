@@ -314,11 +314,11 @@ const categories = [
       code: 'git add .             # stage all changes\ngit add MyClass.java  # stage one file' },
     { label: 'git commit', sub: 'Save a snapshot',
       title: 'git commit',
-      desc: 'Records staged changes with a message. Write descriptive messages -- your teammates (and future you) will thank you.',
+      desc: 'Records staged changes with a message. Write descriptive messages so teammates can understand what changed and why.',
       code: 'git commit -m "Add validation to Arena constructor"\ngit commit -m "Fix bug in calculateTotal for edge case"' },
     { label: 'git push', sub: 'Upload to remote',
       title: 'git push',
-      desc: 'Sends your local commits to the remote repository so teammates can see them. Push regularly, not just at the end.',
+      desc: 'Sends your local commits to the remote repository so teammates can see them.',
       code: 'git push                   # push current branch\ngit push origin feature-x  # push a specific branch' },
   ]},
   { label: 'Inspect', cmds: [
@@ -475,19 +475,17 @@ function showTab(name, btn) {
 
 const collabSharedBefore = [
   { num:1, title:'Create a branch', desc:'Pull latest main first, then create a branch. Tell your teammate what you\'re working on before you start.', code:'git checkout main\ngit pull\ngit checkout -b feature-x' },
-  { num:2, title:'Make changes, stage, commit, and push', desc:'Make changes on your branch. Stage and commit regularly — each commit should be one logical change with a descriptive message. Push often so teammates can see your progress.', code:'git add .\ngit commit -m "Add validateSeats method to Arena"\ngit push origin feature-x' },
+  { num:2, title:'Make changes, stage, commit, and push', desc:'Make changes on your branch. Commit regularly with clear messages, and push often so teammates can see your progress.', code:'git add .\ngit commit -m "Add validateSeats method to Arena"\ngit push origin feature-x' },
 ];
 
 const prSteps = [
-  { title:'Open a pull request', desc:'On GitHub, open a PR and request a review from your teammate. Include a brief summary of what changed and why. Integrate early — don\'t wait until the last day.' },
-  { title:'Address review comments', desc:'Your teammate may leave comments or suggestions. Push additional commits in response — the PR updates automatically.' },
-  { title:'Teammate merges on GitHub', desc:'Once approved, your teammate clicks "Merge pull request" on GitHub. Ideally they do this, not you.' },
+  { title:'A. Open a pull request', desc:'On GitHub, open a PR and request a review from your teammate. Include a brief summary of what changed and why.' },
+  { title:'B. Address review comments', desc:'Your teammate may leave comments or suggestions. Push additional commits in response — the PR updates automatically.' },
+  { title:'C. Teammate merges on GitHub', desc:'Once approved, your teammate clicks "Merge pull request" on GitHub. Ideally they do this, not you.' },
 ];
 
 const localMergeSteps = [
-  { title:'Switch to main and pull latest', desc:'Make sure main is up to date before merging in your changes.', code:'git checkout main\ngit pull' },
-  { title:'Merge your branch', desc:'Merge your feature branch into main locally. Resolve any conflicts if they appear.', code:'git merge feature-x' },
-  { title:'Push main to remote', desc:'Push the updated main branch so your teammate has the latest.', code:'git push' },
+  { title:'Merge and push', desc:'Switch to main, pull latest, merge your branch, and push.', code:'git checkout main\ngit pull\ngit merge feature-x\ngit push' },
 ];
 
 const collabSharedAfter = [
@@ -512,7 +510,7 @@ function renderCollabFlow() {
     '<div class="step-line"><div class="step-num">3</div><div class="step-connector"></div></div>' +
     '<div class="step-content" style="padding-bottom:8px; flex:1; min-width:0">' +
       '<div class="step-title">Merge into main</div>' +
-      '<div class="step-desc" style="margin-bottom:10px">Integrate your branch changes into main so teammates have your latest work.</div>' +
+      '<div class="step-desc" style="margin-bottom:10px">Integrate your branch changes into main so teammates have your latest work. Don\'t wait until the last day.</div>' +
       chooseOneDivider() +
       '<div class="workflow-split-wrapper" id="split-cols"></div>' +
     '</div>';
