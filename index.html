@@ -123,7 +123,7 @@
     border-radius: var(--radius);
     padding: 10px 14px;
     font-family: var(--mono);
-    font-size: 13px;
+    font-size: 12px;
     color: var(--text);
     line-height: 1.7;
     white-space: pre;
@@ -132,7 +132,7 @@
   .code-comment { color: var(--text3); }
 
   .flow-steps { display: flex; flex-direction: column; }
-  .flow-step { display: flex; gap: 14px; align-items: flex-start; }
+  .flow-step { display: flex; gap: 14px; align-items: flex-start; min-width: 0; }
   .step-line { display: flex; flex-direction: column; align-items: center; flex-shrink: 0; }
   .step-num {
     width: 28px; height: 28px; border-radius: 50%;
@@ -141,7 +141,7 @@
     font-size: 12px; font-weight: 500; color: var(--text);
   }
   .step-connector { width: 1px; height: 20px; background: var(--border); }
-  .step-content { padding-bottom: 16px; flex: 1; }
+  .step-content { padding-bottom: 16px; flex: 1; min-width: 0; }
   .step-title { font-size: 14px; font-weight: 500; color: var(--text); margin-bottom: 3px; }
   .step-desc { font-size: 13px; color: var(--text2); line-height: 1.55; margin-bottom: 6px; }
   .step-code {
@@ -159,11 +159,6 @@
   .col-header { font-size: 13px; font-weight: 500; margin-bottom: 12px; }
   .do-col .col-header { color: var(--success-text); }
 
-  .split-options { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 6px; }
-  @media (max-width: 520px) { .split-options { grid-template-columns: 1fr; } }
-  .split-option { border: 0.5px solid var(--border); border-radius: var(--radius); padding: 12px 14px; }
-  .split-option-title { font-size: 12px; font-weight: 500; color: var(--text2); margin-bottom: 8px; }
-  .split-option .step-code { display: block; width: 100%; white-space: pre-wrap; word-break: break-word; }
   .dont-col .col-header { color: var(--danger-text); }
   .rule-item { display: flex; gap: 8px; margin-bottom: 10px; align-items: flex-start; }
   .rule-dot { width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0; margin-top: 5px; }
@@ -185,6 +180,46 @@
     font-size: 13px;
     color: var(--info-text);
     line-height: 1.55;
+  }
+
+  /* Split workflow layout */
+
+  .workflow-split-wrapper {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    margin: 0;
+    position: relative;
+  }
+  @media (max-width: 560px) { .workflow-split-wrapper { grid-template-columns: 1fr; } }
+
+  .split-col {
+    border: 0.5px solid var(--border);
+    border-radius: var(--radius);
+    padding: 12px 14px;
+    background: var(--bg);
+  }
+  .split-col-header {
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: .07em;
+    color: var(--text3);
+    margin-bottom: 10px;
+    padding-bottom: 8px;
+    border-bottom: 0.5px solid var(--border);
+  }
+
+  .split-step { display: flex; gap: 10px; align-items: flex-start; margin-bottom: 10px; }
+  .split-step:last-child { margin-bottom: 0; }
+  .split-step-content { flex: 1; }
+  .split-step-title { font-size: 13px; font-weight: 500; color: var(--text); margin-bottom: 2px; }
+  .split-step-desc { font-size: 12px; color: var(--text2); line-height: 1.5; margin-bottom: 5px; }
+  .split-step-code {
+    font-family: var(--mono); font-size: 11px;
+    background: var(--bg3); padding: 5px 9px;
+    border-radius: var(--radius); display: inline-block;
+    color: var(--text); white-space: pre;
   }
 </style>
 </head>
@@ -210,10 +245,10 @@
 
 <!-- COLLAB -->
 <div class="section" id="tab-collab">
-  <div class="divider-label" style="margin-top:0">Recommended workflow for group projects (GitHub flow)</div>
-  <div class="flow-steps" id="collab-flow"></div>
+  <div class="divider-label" style="margin-top:0">Recommended workflow for group projects</div>
+  <div id="collab-flow"></div>
   <div class="tip-box">
-    Communication matters at every step &mdash; let teammates know which file or class you're working on before you start. See <a href="https://docs.github.com/en/get-started/using-github/github-flow" style="color:var(--info-text);">GitHub Docs</a> for more on GitHub flow.
+    Communication matters at every step &mdash; let teammates know which file or class you're working on before you start. PR workflow follows GitHub flow &mdash; see <a href="https://docs.github.com/en/get-started/using-github/github-flow" style="color:var(--info-text);">GitHub Docs</a> for more.
   </div>
 </div>
 
@@ -231,7 +266,7 @@ public int getTotal() {
 <span class="code-comment">&gt;&gt;&gt;&gt;&gt;&gt;&gt; teammate-branch (incoming changes)</span></div>
 
   <div class="divider-label" style="margin-top:20px">How to resolve it, step by step</div>
-  <div class="flow-steps" id="conflict-flow"></div>
+  <div id="conflict-flow"></div>
   <div class="tip-box">
     <strong style="font-weight:500">Best prevention:</strong> pull before you start working, keep commits small and focused, and communicate with teammates about which files you're editing.
   </div>
@@ -307,8 +342,8 @@ const categories = [
       code: 'git branch              # list branches\ngit branch feature-x    # create new branch\ngit checkout feature-x  # switch to it\n\n# shortcut: create + switch in one command\ngit checkout -b feature-x' },
     { label: 'git merge', sub: 'Combine branches',
       title: 'git merge',
-      desc: 'Integrates changes from one branch into another. Mainly used when resolving conflicts -- to bring main\'s latest changes into your branch locally before pushing.',
-      code: '# bring main into your branch to resolve conflicts\ngit checkout feature-x\ngit merge main' },
+      desc: 'Integrates changes from one branch into another. Used in two situations: (1) local merge workflow — merge your feature branch into main to publish your work; (2) resolving conflicts — bring main\'s latest changes into your feature branch before pushing.',
+      code: '# local merge workflow: merge feature into main\ngit checkout main\ngit merge feature-x\n\n# resolving conflicts: bring main into your branch\ngit checkout feature-x\ngit merge main' },
   ]},
 ];
 
@@ -351,55 +386,84 @@ function showCmd(i) {
     '<div class="code-block">' + c.code.replace(/</g,'&lt;').replace(/>/g,'&gt;') + '</div>';
 }
 
-const conflictSteps = [
-  { num:1, title:'Conflict is triggered', desc:'Triggered when Git detects overlapping changes during a merge. GitHub will flag it on your PR. Resolve locally (see steps below) -- for very simple conflicts you can also resolve directly on GitHub.' },
-  { num:2, title:'Bring main into your branch', desc:'Pull latest main into your branch so you can resolve the conflict locally.', code:'git checkout feature-x\ngit merge main' },
-  { num:3, title:'Find the conflict markers', desc:'Open the conflicting file. Look for &lt;&lt;&lt;&lt;&lt;&lt;&lt;, =======, and &gt;&gt;&gt;&gt;&gt;&gt;&gt; markers. Everything between them is the conflict.' },
-  { num:4, title:'Edit the file to resolve', desc:'Delete the markers and decide what the final code should look like -- keep yours, keep theirs, or combine both. Communicate with your teammate here.' },
-  { num:5, title:'Stage, commit, and push', desc:'Stage the resolved file, commit, and push. The PR updates automatically -- merge once tests pass.', code:'git add YourFile.java\ngit commit -m "Resolve merge conflict in getTotal()"\ngit push origin feature-x' },
+const conflictShared1 = [
+  { num:1, title:'Conflict is triggered', desc:'Triggered when Git detects overlapping changes during a merge. The conflict appears wherever the merge is initiated — on your feature branch for PR workflow, on main for local merge.' },
 ];
 
-function renderFlow(steps, containerId) {
-  const el = document.getElementById(containerId);
-  steps.forEach(function(s, i) {
-    const last = i === steps.length - 1;
-    let contentHtml =
-      '<div class="step-title">' + s.title + '</div>' +
-      '<div class="step-desc">' + s.desc + '</div>';
+const conflictPR2 = { title:'Bring main into your feature branch', desc:'Pull latest main into your feature branch so Git surfaces the conflict there.', code:'git checkout feature-x\ngit merge main' };
+const conflictLocal2 = { title:'Start the merge on main', desc:'Switch to main, pull latest, then merge your feature branch — this is where the conflict appears.', code:'git checkout main\ngit pull\ngit merge feature-x' };
 
-    if (s.split) {
-      if (s.code) {
-        contentHtml +=
-          '<div class="split-option" style="margin-bottom:8px">' +
-            '<div class="split-option-title">Locally — delete locally via command line (both options)</div>' +
-            '<div class="step-code" style="width:fit-content">' + s.code.replace(/</g,'&lt;').replace(/>/g,'&gt;') + '</div>' +
-          '</div>' +
-          '<div class="split-option" style="padding-bottom:8px">' +
-            '<div class="split-option-title" style="margin-bottom:8px">Remote</div>' +
-            '<div class="split-options" style="margin-top:0">';
-      } else {
-        contentHtml += '<div class="split-options">';
-      }
-      s.split.forEach(function(opt) {
-        contentHtml +=
-          '<div class="split-option">' +
-            '<div class="split-option-title">' + opt.title + '</div>' +
-            (opt.desc ? '<div class="step-desc" style="margin-bottom:6px">' + opt.desc + '</div>' : '') +
-            (opt.code ? '<div class="step-code" style="width:fit-content">' + opt.code.replace(/</g,'&lt;').replace(/>/g,'&gt;') + '</div>' : '') +
-          '</div>';
-      });
-      contentHtml += '</div>';
-      if (s.code) contentHtml += '</div>';
-    } else if (s.code) {
-      contentHtml += '<div class="step-code">' + s.code.replace(/</g,'&lt;').replace(/>/g,'&gt;') + '</div>';
-    }
-    el.innerHTML +=
-      '<div class="flow-step">' +
-        '<div class="step-line"><div class="step-num">' + s.num + '</div>' +
-        (!last ? '<div class="step-connector"></div>' : '') + '</div>' +
-        '<div class="step-content">' + contentHtml + '</div>' +
-      '</div>';
-  });
+const conflictShared2 = [
+  { num:3, title:'Find the conflict markers', desc:'Open the conflicting file. Look for &lt;&lt;&lt;&lt;&lt;&lt;&lt;, =======, and &gt;&gt;&gt;&gt;&gt;&gt;&gt; markers. Everything between them is the conflict.' },
+  { num:4, title:'Edit the file to resolve', desc:'Delete the markers and decide what the final code should look like — keep yours, keep theirs, or combine both. Communicate with your teammate here.' },
+];
+
+const conflictPR5 = { title:'Stage, commit, and push your feature branch', desc:'The PR updates automatically. Merge once tests pass.', code:'git add YourFile.java\ngit commit -m "Resolve merge conflict"\ngit push origin feature-x' };
+const conflictLocal5 = { title:'Stage, commit, and push main', desc:'You\'re already on main — commit the resolution and push.', code:'git add YourFile.java\ngit commit -m "Resolve merge conflict"\ngit push' };
+
+function renderSplitCols(prData, localData) {
+  return '<div class="workflow-split-wrapper">' +
+    '<div class="split-col"><div class="split-col-header">Via pull request (GitHub)</div>' + renderSplitStepNoNum(prData) + '</div>' +
+    '<div class="split-col"><div class="split-col-header">Local merge</div>' + renderSplitStepNoNum(localData) + '</div>' +
+  '</div>';
+}
+
+function chooseOneDivider() {
+  return dividerLabel('choose one');
+}
+
+function followYourChoiceDivider() {
+  return dividerLabel('follow your choice');
+}
+
+function dividerLabel(text) {
+  return '<div style="display:flex;align-items:center;gap:10px;margin-bottom:8px">' +
+    '<div style="flex:1;height:0.5px;background:var(--border)"></div>' +
+    '<div style="font-size:11px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:.07em;white-space:nowrap">' + text + '</div>' +
+    '<div style="flex:1;height:0.5px;background:var(--border)"></div>' +
+  '</div>';
+}
+
+function renderConflictFlow() {
+  const container = document.getElementById('conflict-flow');
+
+  // Step 1 shared
+  const flow1 = document.createElement('div');
+  flow1.className = 'flow-steps';
+  conflictShared1.forEach(function(s) { flow1.innerHTML += renderSharedStep(s, false); });
+  container.appendChild(flow1);
+
+  // Step 2 split
+  const step2 = document.createElement('div');
+  step2.className = 'flow-step';
+  step2.innerHTML =
+    '<div class="step-line"><div class="step-num">2</div><div class="step-connector"></div></div>' +
+    '<div class="step-content" style="padding-bottom:8px;flex:1;min-width:0">' +
+      '<div class="step-title">Set up the merge</div>' +
+      '<div class="step-desc" style="margin-bottom:10px">The conflict appears wherever the merge is initiated.</div>' +
+      chooseOneDivider() +
+      renderSplitCols(conflictPR2, conflictLocal2) +
+    '</div>';
+  container.appendChild(step2);
+
+  // Steps 3-4 shared
+  const flow2 = document.createElement('div');
+  flow2.className = 'flow-steps';
+  conflictShared2.forEach(function(s) { flow2.innerHTML += renderSharedStep(s, false); });
+  container.appendChild(flow2);
+
+  // Step 5 split
+  const step5 = document.createElement('div');
+  step5.className = 'flow-step';
+  step5.innerHTML =
+    '<div class="step-line"><div class="step-num">5</div></div>' +
+    '<div class="step-content" style="padding-bottom:0;flex:1;min-width:0">' +
+      '<div class="step-title">Stage, commit, and push</div>' +
+      '<div class="step-desc" style="margin-bottom:10px">Stage the resolved file and push to continue with your workflow.</div>' +
+      followYourChoiceDivider() +
+      renderSplitCols(conflictPR5, conflictLocal5) +
+    '</div>';
+  container.appendChild(step5);
 }
 
 function showTab(name, btn) {
@@ -409,22 +473,130 @@ function showTab(name, btn) {
   btn.classList.add('active');
 }
 
-const collabSteps = [
+const collabSharedBefore = [
   { num:1, title:'Create a branch', desc:'Pull latest main first, then create a branch. Tell your teammate what you\'re working on before you start.', code:'git checkout main\ngit pull\ngit checkout -b feature-x' },
-  { num:2, title:'Make changes, commit, and push', desc:'Make changes on your branch. Make sure your code compiles and tests pass before committing. Make small, focused commits with descriptive messages -- each commit should be one logical change. Push regularly so teammates can see your progress.', code:'git add .\ngit commit -m "Add validateSeats method to Arena"\ngit push origin feature-x' },
-  { num:3, title:'Open a pull request', desc:'On GitHub, open a PR and request a review from your teammate. Include a brief summary of what changed and why. Integrate early -- don\'t wait until the last day.' },
-  { num:4, title:'Address review comments', desc:'Your teammate may leave comments or suggestions. Push additional commits in response -- the PR updates automatically.' },
-  { num:5, title:'Merge your pull request', desc:'Once approved, your teammate clicks "Merge pull request" on GitHub to merge your branch into main. Ideally they do this, not you.' },
-  { num:6, title:'Delete your branch', desc:'After merging, delete the branch to keep the repo tidy. Your commit history is preserved.', code:'git branch -d feature-x  # delete locally\n# click "Delete branch" on the GitHub PR page to delete remote' },
+  { num:2, title:'Make changes, stage, commit, and push', desc:'Make changes on your branch. Stage and commit regularly — each commit should be one logical change with a descriptive message. Push often so teammates can see your progress.', code:'git add .\ngit commit -m "Add validateSeats method to Arena"\ngit push origin feature-x' },
 ];
 
+const prSteps = [
+  { title:'Open a pull request', desc:'On GitHub, open a PR and request a review from your teammate. Include a brief summary of what changed and why. Integrate early — don\'t wait until the last day.' },
+  { title:'Address review comments', desc:'Your teammate may leave comments or suggestions. Push additional commits in response — the PR updates automatically.' },
+  { title:'Teammate merges on GitHub', desc:'Once approved, your teammate clicks "Merge pull request" on GitHub. Ideally they do this, not you.' },
+];
+
+const localMergeSteps = [
+  { title:'Switch to main and pull latest', desc:'Make sure main is up to date before merging in your changes.', code:'git checkout main\ngit pull' },
+  { title:'Merge your branch', desc:'Merge your feature branch into main locally. Resolve any conflicts if they appear.', code:'git merge feature-x' },
+  { title:'Push main to remote', desc:'Push the updated main branch so your teammate has the latest.', code:'git push' },
+];
+
+const collabSharedAfter = [
+  { num:4, title:'Delete your branch', pr:'git branch -d feature-x  # delete locally\n# click "Delete branch" on the GitHub PR page to delete remote', local:'git branch -d feature-x  # delete locally\n# (no remote branch to delete)' },
+];
+
+function renderCollabFlow() {
+  const container = document.getElementById('collab-flow');
+
+  // Shared steps before split
+  const flowBefore = document.createElement('div');
+  flowBefore.className = 'flow-steps';
+  collabSharedBefore.forEach(function(s) {
+    flowBefore.innerHTML += renderSharedStep(s, false);
+  });
+  container.appendChild(flowBefore);
+
+  // Step 3 wrapper: number + connector + split columns inside
+  const step3 = document.createElement('div');
+  step3.className = 'flow-step';
+  step3.innerHTML =
+    '<div class="step-line"><div class="step-num">3</div><div class="step-connector"></div></div>' +
+    '<div class="step-content" style="padding-bottom:8px; flex:1; min-width:0">' +
+      '<div class="step-title">Merge into main</div>' +
+      '<div class="step-desc" style="margin-bottom:10px">Integrate your branch changes into main so teammates have your latest work.</div>' +
+      chooseOneDivider() +
+      '<div class="workflow-split-wrapper" id="split-cols"></div>' +
+    '</div>';
+  container.appendChild(step3);
+
+  // Fill split cols
+  const splitWrapper = document.getElementById('split-cols');
+
+  const prCol = document.createElement('div');
+  prCol.className = 'split-col';
+  prCol.innerHTML = '<div class="split-col-header">Via pull request (GitHub)</div>';
+  prSteps.forEach(function(s) { prCol.innerHTML += renderSplitStepNoNum(s); });
+
+  const lmCol = document.createElement('div');
+  lmCol.className = 'split-col';
+  lmCol.innerHTML = '<div class="split-col-header">Local merge</div>';
+  localMergeSteps.forEach(function(s) { lmCol.innerHTML += renderSplitStepNoNum(s); });
+
+  splitWrapper.appendChild(prCol);
+  splitWrapper.appendChild(lmCol);
+
+  // Shared steps after split
+  const flowAfter = document.createElement('div');
+  flowAfter.className = 'flow-steps';
+  collabSharedAfter.forEach(function(s) {
+    flowAfter.innerHTML += renderDeleteStep(s);
+  });
+  container.appendChild(flowAfter);
+}
+
+function renderSharedStep(s, last) {
+  let contentHtml =
+    '<div class="step-title">' + s.title + '</div>' +
+    '<div class="step-desc">' + s.desc + '</div>';
+  if (s.code) {
+    contentHtml += '<div class="step-code">' + s.code.replace(/</g,'&lt;').replace(/>/g,'&gt;') + '</div>';
+  }
+  return '<div class="flow-step">' +
+    '<div class="step-line"><div class="step-num">' + s.num + '</div>' +
+    (!last ? '<div class="step-connector"></div>' : '') + '</div>' +
+    '<div class="step-content" style="padding-bottom:' + (last ? '0' : '8px') + ';min-width:0">' + contentHtml + '</div>' +
+    '</div>';
+}
+
+function renderDeleteStep(s) {
+  return '<div class="flow-step">' +
+    '<div class="step-line"><div class="step-num">' + s.num + '</div></div>' +
+    '<div class="step-content" style="padding-bottom:0; flex:1; min-width:0">' +
+      '<div class="step-title">' + s.title + '</div>' +
+      '<div class="step-desc" style="margin-bottom:10px">Keep the repo tidy — your commit history is preserved.</div>' +
+      followYourChoiceDivider() +
+      '<div class="workflow-split-wrapper">' +
+        '<div class="split-col">' +
+          '<div class="split-col-header">Via pull request (GitHub)</div>' +
+          '<div class="split-step-code" style="display:block;white-space:pre-wrap;margin-top:4px">' + s.pr.replace(/</g,'&lt;').replace(/>/g,'&gt;') + '</div>' +
+        '</div>' +
+        '<div class="split-col">' +
+          '<div class="split-col-header">Local merge</div>' +
+          '<div class="split-step-code" style="display:block;white-space:pre-wrap;margin-top:4px">' + s.local.replace(/</g,'&lt;').replace(/>/g,'&gt;') + '</div>' +
+        '</div>' +
+      '</div>' +
+    '</div>' +
+  '</div>';
+}
+
+function renderSplitStepNoNum(s) {
+  let html = '<div class="split-step" style="gap:0">' +
+    '<div class="split-step-content">' +
+    '<div class="split-step-title">' + s.title + '</div>' +
+    '<div class="split-step-desc">' + s.desc + '</div>';
+  if (s.code) {
+    html += '<div class="split-step-code">' + s.code.replace(/</g,'&lt;').replace(/>/g,'&gt;') + '</div>';
+  }
+  html += '</div></div>';
+  return html;
+}
+
 renderCmds();
-renderFlow(collabSteps, 'collab-flow');
-renderFlow(conflictSteps, 'conflict-flow');
+renderCollabFlow();
+renderConflictFlow();
 </script>
 
 <footer style="margin-top: 2.5rem; padding-top: 1rem; border-top: 0.5px solid var(--border); font-size: 12px; color: var(--text3);">
-  Created by Ivy Wang &middot; Built with <a href="https://claude.ai" style="color: var(--text3);">Claude</a> (Anthropic) &middot; GitHub flow via <a href="https://docs.github.com/en/get-started/using-github/github-flow" style="color: var(--text3);">GitHub Docs</a>
+  Created by Ivy Wang &middot; Built with <a href="https://claude.ai" style="color: var(--text3);">Claude</a> (Anthropic) &middot; <a href="https://docs.github.com/en/get-started/using-github/github-flow" style="color: var(--text3);">GitHub flow</a> &middot; Dos &amp; don'ts from Professor Chris's Piazza
 </footer>
 </body>
 </html>
